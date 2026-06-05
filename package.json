@@ -1,0 +1,14 @@
+{
+  "name": "nash-services",
+  "version": "1.0.0",
+  "description": "Best Face Forward - Public + Client Portal",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 -m http.server 8000",
+    "serve": "npx http-server -p 8000 -c-1",
+    "dev": "live-server --port=8000"
+  },
+  "keywords": ["portal", "services"],
+  "author": "",
+  "license": "MIT"
+}

@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NASH Services | Public + Client Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <style>
+        .video-bg {
+            position: relative;
+            overflow: hidden;
+        }
+        .video-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 1;
+        }
+        .video-bg video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+        }
+        .video-content {
+            position: relative;
+            z-index: 2;
+        }
+    </style>
+</head>
+<body class="bg-slate-50">
+    <!-- Top Bar -->
+    <div class="bg-slate-900 text-white text-sm py-2 px-6 flex justify-between">
+        <div>NASH Services — Professional Property & Eviction Services</div>
+        <button onclick="window.open('https://knoxzic.github.io/nash-admin/', '_blank')" 
+                class="text-xs px-3 py-1 bg-white/10 rounded">View Admin</button>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="bg-white border-b">
+        <div class="max-w-screen-xl mx-auto px-6 flex justify-between items-center h-16">
+            <div class="flex items-center gap-x-3">
+                <div class="w-10 h-10 bg-red-700 rounded-lg flex items-center justify-center text-white font-bold text-lg">
+                    <i class="fas fa-trash-alt"></i>
+                </div>
+                <span class="font-bold text-2xl text-red-700">NASH</span>
+            </div>
+            
+            <div id="nav-auth">
+                <button onclick="showLoginModal()" class="px-5 h-10 text-sm font-semibold">Log in</button>
+                <button onclick="showLoginModal(true)" class="px-6 h-10 bg-red-700 text-white rounded-3xl text-sm font-semibold">Get Started</button>
+            </div>
+            
+            <div id="nav-client" class="hidden items-center gap-x-4">
+                <span id="nav-user-name" class="font-semibold"></span>
+                <button onclick="logoutUser()" class="text-xs px-4 h-9 border rounded-2xl">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- PUBLIC SITE -->
+    <div id="public-site">
+        <!-- Hero with Video Background -->
+        <div class="video-bg relative h-96 flex items-center justify-center">
+            <video autoplay muted loop playsinline>
+                <source src="./videos/bg-1.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="video-content text-center text-white">
+                <h1 class="text-5xl font-bold tracking-tighter mb-4">Professional Property & Eviction Services</h1>
+                <p class="text-xl">Fast, Reliable, and Compliant Service Solutions</p>
+            </div>
+        </div>
+
+        <!-- Services / Pricing -->
+        <div class="max-w-screen-xl mx-auto px-6 py-12">
+            <h2 class="text-3xl font-semibold mb-8 text-center">Our Services</h2>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Trash Removal -->
+                <div class="bg-white border rounded-3xl p-6 hover:shadow-lg transition">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="fas fa-dumpster text-red-700 text-2xl"></i>
+                        <div class="font-semibold">Trash Removal</div>
+                    </div>
+                    <div class="text-3xl font-bold mt-2">$150</div>
+                    <p class="text-sm text-slate-600 mt-2">Fast removal of junk and debris</p>
+                    <button onclick="contactService('Trash Removal')" 
+                            class="mt-4 w-full h-11 bg-red-700 text-white rounded-3xl font-semibold hover:bg-red-800">
+                        Request Service
+                    </button>
+                </div>
+
+                <!-- Eviction Services -->
+                <div class="bg-white border-2 border-red-700 rounded-3xl p-6 relative hover:shadow-lg transition">
+                    <div class="absolute -top-3 right-6 bg-red-700 text-white text-xs px-3 py-0.5 rounded">MOST REQUESTED</div>
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="fas fa-gavel text-red-700 text-2xl"></i>
+                        <div class="font-semibold">Eviction Services</div>
+                    </div>
+                    <div class="text-3xl font-bold mt-2">$2,500</div>
+                    <p class="text-sm text-slate-600 mt-2">Professional eviction assistance & removal</p>
+                    <button onclick="contactService('Eviction Services')" 
+                            class="mt-4 w-full h-11 bg-red-700 text-white rounded-3xl font-semibold hover:bg-red-800">
+                        Request Service
+                    </button>
+                </div>
+
+                <!-- Hoarding Cleanup -->
+                <div class="bg-white border rounded-3xl p-6 hover:shadow-lg transition">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="fas fa-broom text-red-700 text-2xl"></i>
+                        <div class="font-semibold">Hoarding Cleanup</div>
+                    </div>
+                    <div class="text-3xl font-bold mt-2">$3,000+</div>
+                    <p class="text-sm text-slate-600 mt-2">Compassionate hoarding cleanup services</p>
+                    <button onclick="contactService('Hoarding Cleanup')" 
+                            class="mt-4 w-full h-11 bg-red-700 text-white rounded-3xl font-semibold hover:bg-red-800">
+                        Request Service
+                    </button>
+                </div>
+
+                <!-- Debris Removal -->
+                <div class="bg-white border rounded-3xl p-6 hover:shadow-lg transition">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="fas fa-truck text-red-700 text-2xl"></i>
+                        <div class="font-semibold">Debris Removal</div>
+                    </div>
+                    <div class="text-3xl font-bold mt-2">$250+</div>
+                    <p class="text-sm text-slate-600 mt-2">Construction & property debris removal</p>
+                    <button onclick="contactService('Debris Removal')" 
+                            class="mt-4 w-full h-11 bg-red-700 text-white rounded-3xl font-semibold hover:bg-red-800">
+                        Request Service
+                    </button>
+                </div>
+
+                <!-- Estate Cleanout -->
+                <div class="bg-white border rounded-3xl p-6 hover:shadow-lg transition">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="fas fa-home text-red-700 text-2xl"></i>
+                        <div class="font-semibold">Estate Cleanout</div>
+                    </div>
+                    <div class="text-3xl font-bold mt-2">$1,500+</div>
+                    <p class="text-sm text-slate-600 mt-2">Full estate and property cleanout</p>
+                    <button onclick="contactService('Estate Cleanout')" 
+                            class="mt-4 w-full h-11 bg-red-700 text-white rounded-3xl font-semibold hover:bg-red-800">
+                        Request Service
+                    </button>
+                </div>
+
+                <!-- Biohazard Cleanup -->
+                <div class="bg-white border rounded-3xl p-6 hover:shadow-lg transition">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="fas fa-shield-alt text-red-700 text-2xl"></i>
+                        <div class="font-semibold">Biohazard Cleanup</div>
+                    </div>
+                    <div class="text-3xl font-bold mt-2">$2,000+</div>
+                    <p class="text-sm text-slate-600 mt-2">Professional biohazard remediation</p>
+                    <button onclick="contactService('Biohazard Cleanup')" 
+                            class="mt-4 w-full h-11 bg-red-700 text-white rounded-3xl font-semibold hover:bg-red-800">
+                        Request Service
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Intake Form Section -->
+        <div id="intake" class="video-bg relative py-20">
+            <video autoplay muted loop playsinline>
+                <source src="./videos/bg-2.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="video-content max-w-2xl mx-auto px-6">
+                <h2 class="text-3xl font-semibold mb-6 text-white">Request a Service Quote</h2>
+                <div class="bg-white rounded-3xl shadow-lg p-8">
+                    <input id="org-name" placeholder="Your Name" class="w-full border p-3 rounded-2xl mb-3" value="">
+                    <input id="contact-email" placeholder="Email" class="w-full border p-3 rounded-2xl mb-3" value="">
+                    <input id="contact-phone" placeholder="Phone Number" class="w-full border p-3 rounded-2xl mb-3" value="">
+                    <textarea id="business-desc" placeholder="Describe your service needs" class="w-full border p-3 rounded-2xl mb-4" rows="3"></textarea>
+                    
+                    <button onclick="submitIntakeForm()" 
+                            class="w-full h-12 bg-red-700 text-white rounded-3xl font-semibold hover:bg-red-800">
+                        Request a Quote
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CLIENT PORTAL -->
+    <div id="client-portal" class="hidden max-w-screen-xl mx-auto px-6 py-10">
+        <h2 id="client-welcome" class="text-3xl font-semibold">Welcome back</h2>
+        <p class="text-slate-500 mb-8">Thank you for choosing NASH Services for your property needs.</p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white border rounded-3xl p-6">
+                <h3 class="font-semibold">Service Status</h3>
+                <div class="text-4xl font-bold mt-2">In Progress</div>
+            </div>
+            <div class="bg-white border rounded-3xl p-6">
+                <h3 class="font-semibold">Completion Date</h3>
+                <div class="text-4xl font-bold mt-2">5 days</div>
+            </div>
+            <div class="bg-white border rounded-3xl p-6">
+                <h3 class="font-semibold">Support</h3>
+                <div class="text-4xl font-bold mt-2">24/7</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-[100]">
+        <div class="bg-white rounded-3xl w-full max-w-md p-8">
+            <h2 class="text-2xl font-semibold mb-6">Welcome to NASH Services</h2>
+            <input id="login-email" type="email" placeholder="Email address" class="w-full border p-3 rounded-2xl mb-3">
+            <input id="login-password" type="password" placeholder="Password" class="w-full border p-3 rounded-2xl mb-4">
+            <button onclick="loginWithFirebase()" class="w-full h-12 bg-red-700 text-white rounded-3xl font-semibold hover:bg-red-800">Sign In</button>
+        </div>
+    </div>
+
+    <script>
+        // ==================== FIREBASE CONFIG ====================
+        const firebaseConfig = {
+            apiKey: "AIzaSyBxZDiGhbDyPwIhCSH6f2YjlK0B_dlF2Qk",
+            authDomain: "bestfaceforward-a5f69.firebaseapp.com",
+            projectId: "bestfaceforward-a5f69",
+            storageBucket: "bestfaceforward-a5f69.firebasestorage.app",
+            messagingSenderId: "657899604318",
+            appId: "1:657899604318:web:227722de6309c83c5467cf"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        let currentUser = null;
+
+        // Service Contact Request
+        function contactService(serviceName) {
+            alert(`Thank you for your interest in ${serviceName}.\n\nA representative will contact you shortly to discuss your needs and provide a quote.`);
+        }
+
+        // Submit Service Request to Firestore
+        async function submitIntakeForm() {
+            const name = document.getElementById('org-name').value;
+            const email = document.getElementById('contact-email').value;
+            const phone = document.getElementById('contact-phone').value;
+            const description = document.getElementById('business-desc').value;
+
+            if (!name || !email || !description) {
+                alert("Please fill in all required fields.");
+                return;
+            }
+
+            const formData = {
+                clientName: name,
+                email: email,
+                phone: phone,
+                serviceNeeds: description,
+                submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                status: "Pending Quote"
+            };
+
+            try {
+                await db.collection("serviceRequests").add(formData);
+                alert("Service request submitted successfully! Our team will contact you within 24 hours.");
+                document.getElementById('org-name').value = '';
+                document.getElementById('contact-email').value = '';
+                document.getElementById('contact-phone').value = '';
+                document.getElementById('business-desc').value = '';
+            } catch (error) {
+                console.error(error);
+                alert("Error submitting request. Please try again.");
+            }
+        }
+
+        // Firebase Login
+        async function loginWithFirebase() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            try {
+                const result = await auth.signInWithEmailAndPassword(email, password);
+                currentUser = result.user;
+                showClientPortal();
+            } catch (error) {
+                alert("Login failed: " + error.message);
+            }
+        }
+
+        function showClientPortal() {
+            document.getElementById('public-site').classList.add('hidden');
+            document.getElementById('client-portal').classList.remove('hidden');
+            document.getElementById('nav-auth').classList.add('hidden');
+            document.getElementById('nav-client').classList.remove('hidden');
+            document.getElementById('nav-user-name').innerText = currentUser.email.split('@')[0];
+            document.getElementById('login-modal').classList.add('hidden');
+        }
+
+        function logoutUser() {
+            auth.signOut();
+            location.reload();
+        }
+
+        function showLoginModal() {
+            document.getElementById('login-modal').classList.remove('hidden');
+            document.getElementById('login-modal').classList.add('flex');
+        }
+
+        // Auto login check
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                currentUser = user;
+                showClientPortal();
+            }
+        });
+    </script>
+</body>
+</html>
